@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import Login from "./Login";
 
 export default function Signup() {
   const handleSubmit = (e) => {
@@ -69,10 +70,11 @@ export default function Signup() {
             </button>
             <p className="text-sm">
               Have an account?{' '}
-              <Link to="/" className="text-blue-500 underline">
-                Login
-                
-              </Link>
+              <div className="">
+    <button className="bg-black text-white px-3 py-2  rounded-md hover:bg-slate-800 duration-300 cursor-pointer "
+    onClick={()=>document.getElementById("my_modal_3").showModal()}>Login</button>
+    <Login/>
+  </div>
             
             </p>
           </div>
