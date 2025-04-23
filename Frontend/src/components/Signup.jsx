@@ -1,16 +1,22 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useForm } from "react-hook-form";
 import Login from "./Login";
 
 export default function Signup() {
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    alert('Signup submitted!');
-    // You can handle form data here later
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+
+  const onSubmit = (data) => {
+    console.log("Signup data:", data);
+    alert("Signup submitted!");
+    // You can post data to backend here
   };
 
   const handleClose = () => {
-    window.location.href = '/'; // Redirect to homepage when "close" button is clicked
+    window.location.href = '/'; // Redirect to homepage
   };
 
   return (
@@ -26,7 +32,7 @@ export default function Signup() {
 
         <h2 className="text-2xl font-bold mb-6 text-center">Signup</h2>
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           {/* Name */}
           <div className="mb-4">
             <label className="block mb-1">Name</label>
@@ -34,8 +40,9 @@ export default function Signup() {
               type="text"
               placeholder="Enter your full name"
               className="w-full px-4 py-2 border rounded-md outline-none"
-              required
+              {...register("name", { required: true })}
             />
+            {errors.name && <p className="text-red-500 text-sm">Name is required</p>}
           </div>
 
           {/* Email */}
@@ -45,8 +52,9 @@ export default function Signup() {
               type="email"
               placeholder="Enter your email"
               className="w-full px-4 py-2 border rounded-md outline-none"
-              required
+              {...register("email", { required: true })}
             />
+            {errors.email && <p className="text-red-500 text-sm">Email is required</p>}
           </div>
 
           {/* Password */}
@@ -56,8 +64,9 @@ export default function Signup() {
               type="password"
               placeholder="Enter your password"
               className="w-full px-4 py-2 border rounded-md outline-none"
-              required
+              {...register("password", { required: true })}
             />
+            {errors.password && <p className="text-red-500 text-sm">Password is required</p>}
           </div>
 
           {/* Submit & Login Link */}
@@ -68,18 +77,23 @@ export default function Signup() {
             >
               Signup
             </button>
-            <p className="text-sm">
+
+            <div className="text-sm">
               Have an account?{' '}
-              <div className="">
-    <button className="bg-black text-white px-3 py-2  rounded-md hover:bg-slate-800 duration-300 cursor-pointer "
-    onClick={()=>document.getElementById("my_modal_3").showModal()}>Login</button>
-    <Login/>
-  </div>
-            
-            </p>
+              <button
+                type="button"
+                className="text-blue-500 underline"
+                onClick={() => document.getElementById("my_modal_3").showModal()}
+              >
+                Login
+              </button>
+            </div>
           </div>
         </form>
       </div>
+
+      {/* Login Modal lives outside form layout so it's globally accessible */}
+      <Login />
     </div>
   );
 }

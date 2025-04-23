@@ -1,8 +1,16 @@
 import React, { useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useForm } from "react-hook-form";
 
 const Login = () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (location.pathname === "/login") {
@@ -10,20 +18,27 @@ const Login = () => {
     }
   }, [location]);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Login attempted');
+  const onSubmit = (data) => {
+    console.log('Login Data:', data);
+    // Perform login logic here
+    document.getElementById("my_modal_3")?.close();
+    navigate("/"); // Navigate to home after login
+  };
+
+  const handleClose = () => {
+    document.getElementById('my_modal_3')?.close();
+    navigate('/'); // Navigate to home when modal is closed
   };
 
   return (
     <div>
       <dialog id="my_modal_3" className="modal">
         <div className="modal-box">
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit(onSubmit)}>
             <button
               type="button"
               className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-              onClick={() => document.getElementById('my_modal_3')?.close()}
+              onClick={handleClose}
             >
               ✕
             </button>
@@ -34,7 +49,9 @@ const Login = () => {
                 type='email'
                 placeholder="Enter your email"
                 className="w-80 px-3 py-1 border rounded-md outline-none"
+                {...register("email", { required: true })}
               />
+              {errors.email && <p className="text-red-500 text-sm">Email is required</p>}
             </div>
             <div className='mt-4 space-y-2'>
               <span>Password</span><br />
@@ -42,7 +59,9 @@ const Login = () => {
                 type='password'
                 placeholder="Enter your password"
                 className="w-80 px-3 py-1 border rounded-md outline-none"
+                {...register("password", { required: true })}
               />
+              {errors.password && <p className="text-red-500 text-sm">Password is required</p>}
             </div>
             <div className='flex justify-around mt-4'>
               <button
