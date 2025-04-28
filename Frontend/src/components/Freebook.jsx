@@ -2,26 +2,38 @@ import React, { useEffect, useState } from 'react';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
-import Cards from '../components/Cards'; // Make sure this path is correct
+import Cards from '../components/Cards';
+import axios from "axios";
 
 export default function Freebook() {
-  const [filterData, setFilterData] = useState([]);
+  const [book, setBook] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/list.json')
-      .then((res) => res.json())
-      .then((data) => {
-        const filtered = data.filter((item) => item.category === 'Free');
-        setFilterData(filtered);
+    const getBook = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/book");
+
+        // Filter the data for "Free" category
+        const filteredData = res.data.filter(item => item.category === 'Free');
+        
+        // Log the filtered data
+        console.log(filteredData);
+        
+        // Set the filtered data to state
+        setBook(filteredData);
+        
+        // Stop loading once data is fetched
         setLoading(false);
-      })
-      .catch((error) => {
-        console.error('Error fetching data:', error);
+      } catch (error) {
+        console.log(error);
         setLoading(false);
-      });
+      }
+    };
+    getBook();
   }, []);
 
+  // Slider settings
   const settings = {
     dots: true,
     infinite: false,
@@ -56,6 +68,7 @@ export default function Freebook() {
     ]
   };
 
+  // Show loading until data is fetched
   if (loading) return <p className="text-center py-10">Loading...</p>;
 
   return (
@@ -65,8 +78,9 @@ export default function Freebook() {
         <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ratione qui recusandae dicta neque, dolores voluptatum eveniet nihil debitis assumenda aliquam!</p>
       </div>
 
+      {/* Render the Slider with filtered books */}
       <Slider {...settings}>
-        {filterData.map((item) => (
+        {book.map((item) => (
           <Cards key={item.id} item={item} />
         ))}
       </Slider>

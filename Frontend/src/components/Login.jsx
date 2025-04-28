@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useForm } from "react-hook-form";
+import axios from "axios"
+import toast from 'react-hot-toast';
 
 const Login = () => {
   const {
@@ -18,11 +20,42 @@ const Login = () => {
     }
   }, [location]);
 
-  const onSubmit = (data) => {
-    console.log('Login Data:', data);
-    // Perform login logic here
-    document.getElementById("my_modal_3")?.close();
-    navigate("/"); // Navigate to home after login
+  const onSubmit = async (data) => {
+    const userInfo={
+      
+      email:data.email,
+      password:data.password,
+    }
+   await axios.post("http://localhost:5000/user/login",userInfo)
+   .then((res)=>{
+    console.log(res.data);
+    if(res.data){
+      toast.success("login successful")
+      handleClose();
+      setTimeout(()=>{
+       
+        window.location.reload();
+        localStorage.setItem("users",JSON.stringify(res.data.user));
+      },1000);
+     
+    }
+    
+   }).catch((err)=>{
+    if (err.response) {
+      // Backend returned an error response (status code outside of 2xx)
+      console.error("Error response:", err.response.data);
+      toast.error("Error: " + err.response.data.message || "Unknown server error");
+      setTimeout(()=>{},3000);
+    } else if (err.request) {
+      // Request was made but no response received
+      console.error("Error request:", err.request);
+      setTimeout(()=>{},3000);
+    } else {
+      // Something else went wrong during request setup
+      console.error("Error message:", err.message);
+      setTimeout(()=>{},3000);
+    }
+   })
   };
 
   const handleClose = () => {

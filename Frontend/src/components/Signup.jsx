@@ -1,17 +1,46 @@
 import React from 'react';
 import { useForm } from "react-hook-form";
+import {useNavigate,useLocation} from "react-router-dom";
 import Login from "./Login";
-
+import axios from "axios"
+import toast from 'react-hot-toast'
 export default function Signup() {
+  const location=useLocation()
+  const navigate=useNavigate()
+  const from=location.state?.from?.pathname || "/"
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
 
-  const onSubmit = (data) => {
-    console.log("Signup data:", data);
-    alert("Signup submitted!");
+  const onSubmit = async(data) => {
+    const userInfo={
+      fullname:data.fullname,
+      email:data.email,
+      password:data.password,
+    }
+   await axios.post("http://localhost:5000/user/signup",userInfo)
+   .then((res)=>{
+    
+    if(res.data){
+      toast.success("signup successful");
+      navigate(from ,{replace:true});
+    }
+    localStorage.setItem("users",JSON.stringify(res.data.user));
+   }).catch((err)=>{
+    if (err.response) {
+      // Backend returned an error response (status code outside of 2xx)
+      console.error("Error response:", err.response.data);
+      toast.error("Error: " + err.response.data.message || "Unknown server error");
+    } else if (err.request) {
+      // Request was made but no response received
+      console.error("Error request:", err.request);
+    } else {
+      // Something else went wrong during request setup
+      console.error("Error message:", err.message);
+    }
+   })
     // You can post data to backend here
   };
 
@@ -40,7 +69,7 @@ export default function Signup() {
               type="text"
               placeholder="Enter your full name"
               className="w-full px-4 py-2 border rounded-md outline-none"
-              {...register("name", { required: true })}
+              {...register("fullname", { required: true })}
             />
             {errors.name && <p className="text-red-500 text-sm">Name is required</p>}
           </div>
